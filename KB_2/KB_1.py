@@ -4,7 +4,7 @@ import json
 from pycbrf.toolbox import ExchangeRates # импортируем библиотеку
 
 
-bot = telebot.TeleBot('6865245157:AAHh9zAPv-VYjLGtvQybUdRMhQ91rk9kuOM');
+bot = telebot.TeleBot('token');
 
 list_of_users = {}
 my_chats = [1022066349]
