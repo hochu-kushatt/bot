@@ -1,11 +1,10 @@
 import telebot
 from telebot import types
 import json
-from time import time
 from pycbrf.toolbox import ExchangeRates # импортируем библиотеку
 
 
-bot = telebot.TeleBot('token');
+bot = telebot.TeleBot('6865245157:AAHh9zAPv-VYjLGtvQybUdRMhQ91rk9kuOM');
 
 list_of_users = {}
 my_chats = [1022066349]
@@ -13,7 +12,6 @@ kurs_trig = 0
 
 # list_of_aktiviti = []
 # list_of_titles = []
-start_t = time()
 
 def reading_my_chats():
     with open('chats.txt', 'r') as filehandle:
@@ -25,7 +23,7 @@ def write_my_chats():
         filehandle.writelines("%s\n" % place for place in my_chats)
     return print('list saved')
         
-def parse_keys_to_int(initial_value):
+def parse_keys_to_int(initial_value):# считать ключи
     if isinstance(initial_value, dict):
         return {int(key):value for key,value in initial_value.items()}
     return initial_value
@@ -60,12 +58,12 @@ def get_text_messages(message):
         if message.text[0 : 4] == '/add':
             my_chats.append(int(message.text[5:]))
             bot.send_message(1022066349, "added!")
-            write_my_chats()
+            # write_my_chats()
     if (message.chat.id in my_chats):
         global list_of_users
         global start
         
-        def sorted_tuple():
+        def sorted_tuple(): # сортирует челиков по колву сообщений с помощью лямбдафункции
             sort_tuple = sorted(list_of_users.items(), key=lambda x: x[1], reverse=True)
             sort_tuple = list(map(list, sort_tuple))
             return sort_tuple
@@ -88,11 +86,11 @@ def get_text_messages(message):
 
             except Exception as ex:
                 bot.send_message(message.chat.id, ex)
-                bot.send_message(message.chat.id, ex)
+                #bot.send_message(message.chat.id, ex)
         if message.text == "💪 Топ активности":
             trig = 1
             sorted_list = sorted_tuple()
-            for i in range(len(sorted_list)):
+            for i in range(len(sorted_list)):# переюор челиков для просвоения юзернеймом
                 user_id = sorted_list[i][0]
                 sorted_list[i][0] = bot.get_chat_member(user_id, user_id).user.username
             for line in sorted_list:
@@ -105,19 +103,14 @@ def get_text_messages(message):
             bot.send_message(message.chat.id, "Первые десять мест по активности")
         if message.text == "📈 Что по рублю?":
             bot.send_message(message.chat.id, "Введите дату в формате \nгггг-мм-дд")
+           
             kurs_trig = 1
-            
         
         if  (len(message.text) == 10) and (kurs_trig == 1):
             try:
                 data = message.text
-                # if len(message.text) != 10:
-                #     bot.send_message(message.chat.id, "Формат даты неверен(((")
-                #     data = None
                 rates = ExchangeRates(data) # задаем дату, за которую хотим получить данные
                 result = [rates['USD'].value, rates['EUR'].value]
-                if data == None:
-                    data = 'сегодня'
                 bot.send_message(message.chat.id, f"{data}")
                 bot.send_message(message.chat.id, f"RU-USD: {result[0]}")
                 bot.send_message(message.chat.id, f"RU-EUR: {result[1]}")
@@ -137,9 +130,9 @@ def get_text_messages(message):
                 bot.send_photo(message.chat.id, img)
             kurs_trig = 0
                 
-        if (time() - start_t >= 60*5):
-            with open('data.json', 'w') as f:
-                json.dump(list_of_users, f)
+        
+        with open('data.json', 'w') as f:
+            json.dump(list_of_users, f)
     else:
         bot.send_message(1022066349, "НСД к боту")
         user_id = message.from_user.id
